@@ -1,0 +1,37 @@
+<RCC>
+    <qresource prefix="/Icons">
+        <file>SunSolarPanel.jpg</file>
+        <file>ChargeController.png</file>
+        <file>Arrow.png</file>
+        <file>Off.png</file>
+        <file>On.png</file>
+        <file>RedBlackTerminals.jpg</file>
+        <file>Battery_Bidirectional_Arrow.PNG</file>
+        <file>ChargeController_LeftArrow.PNG</file>
+        <file>Down Arrow.PNG</file>
+        <file>Power_RighArrow.PNG</file>
+        <file>Bulb_Off.png</file>
+        <file>Bulb_On.png</file>
+        <file>ArrowL_SolarTracker.png</file>
+        <file>ArrowR_Config.png</file>
+    </qresource>
+    <qresource prefix="/Icons/Battery">
+        <file>Battery1.png</file>
+        <file>Battery2.png</file>
+        <file>Battery3.png</file>
+        <file>Battery4.png</file>
+        <file>Battery5.png</file>
+        <file>Battery6.png</file>
+        <file>Battery7.png</file>
+        <file>Battery8.png</file>
+        <file>Battery9.png</file>
+        <file>Battery10.png</file>
+        <file>Battery11.png</file>
+        <file>Battery12.png</file>
+        <file>Battery13.png</file>
+        <file>Battery14.png</file>
+        <file>Battery15.png</file>
+        <file>Battery16.png</file>
+        <file>Battery17.png</file>
+    </qresource>
+</RCC>
