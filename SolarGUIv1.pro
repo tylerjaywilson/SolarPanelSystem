@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+#Enable c++11
 QMAKE_CXXFLAGS += -std=c++0x
 
 TARGET = SolarGUIv1
