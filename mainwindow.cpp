@@ -11,15 +11,17 @@
 #include "cccomm.hpp"
 #include "psoccomm.hpp"
 
-#define ON      1
-#define OFF     0
 
-extern int8_t gui_PowerButton_isOn;
-extern int8_t gui_SolarArrow_isOn;
-extern int8_t gui_ChargerArrow_isOn;
-extern int8_t gui_BatteryArrow_isOn;
-extern int8_t gui_LoadArrow_isOn;
-extern int8_t gui_ExternalArrow_isOn;
+/*
+float   solarPanelVoltage   = 100.0;
+float   solarPanelCurrent   = 6.0;
+float   chargeContrlVoltage = 14.4;
+float   chargeContrlCurrent = 41.7;
+float   batteryCurrent      = 30.0;
+float   batteryVoltage      = 12.5;
+float   batteryPercentage   = 80;
+float   loadCurrent         = 11.7;
+*/
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -29,12 +31,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setStyleSheet("background-color: white;");
     // set up class variables
-    //
+    gui_PowerButton_isOn    = OFF;
+    gui_SolarArrow_isOn     = OFF;
+    gui_ChargerArrow_isOn   = OFF;
+    gui_BatteryArrow_isOn   = OFF;
+    gui_LoadArrow_isOn      = OFF;
+    gui_ExternalArrow_isOn  = OFF;
 
     // 1 second timer setup
     updateDispTimer     = new QTimer(this);
     connect(updateDispTimer, SIGNAL(timeout()), this, SLOT(MyTimerExpired()));        // sets a signal/slot for when the 1 second timer expires
-    updateDispTimer->start(4000);
+    updateDispTimer->start(1000);
+    // hide extra display stuff
 /*
     ui->lbl_SolarPanelVoltage->hide();
     ui->lbl_SolarPanelCurrent->hide();
@@ -54,18 +62,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lbl_SolarPanelVoltage_7->hide();
     ui->lbl_SolarPanelVoltage_8->hide();
 
-    temp = 120;
-/**/
-    ErrorText("ERROR!");
-    WarningText("Warning!");
-    ImportantText("Important Text.");
-    NormalText("Normal");
-    ErrorText("ERROR!");
-    WarningText("Warning!");
-    ImportantText("Important Text.");
-    NormalText("Normal");
+    NormalText("Welcome to the Solar Project.");
+    NormalText("Designed and Created by Jonathan Fielding - Electrical Engineer");
 
-
+// Initialize Offset and gain Parameters
+    psoc.setBatteryVoltageGain( 15.689);
+    psoc.setLoadVoltageGain(    15.730);
+    psoc.setExternalVoltageGain(15.574);
+    psoc.setBatteryCurrentOffset( -0.050);
+    psoc.setLoadCurrentOffset(    -0.040);
+    psoc.setExternalCurrentOffset(-0.040);
 }
 
 MainWindow::~MainWindow()
@@ -73,55 +79,138 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+
+// ****************************
+// *     1 SECOND TIMER       *
+// ****************************
 void MainWindow::MyTimerExpired()   // this will fire every second or the time set in the variable timer.
 {
-    float tempNum;
+    float voltage;
+    float current;
+    float power;
 
+// ******* UPDATE CHARGE CONTROLLER
+    chargeController.clearIsUpToDate();
+        voltage = chargeController.getPVInputVoltage();
+    ui->lbl_SolarPanelVoltage->setText(QString::number(voltage) + " V");
+        current = chargeController.getChargingCurrent2();
+    ui->lbl_SolarPanelCurrent->setText(QString::number(current) + " A"); // check to see if this is the correct value. DONE. CORRECT.
+        current = chargeController.getChargingCurrent();
+    ui->lbl_ChargerCurrent->setText(QString::number(current) + " A");
+        power = chargeController.getChargingPower();
+    ui->lbl_ChargeControllerPower->setText(QString::number(power) + " W");
+        if(power > 0)
+        {
+            QPixmap pix(":/Icons/Arrow_s_Down.PNG");
+            QIcon icon(pix);
+            ui->pb_SolarDnArrow->setIcon(icon);
+            QPixmap pix2(":/Icons/Arrow_s_Right.PNG");
+            QIcon icon2(pix2);
+            ui->pb_ChargeControler_Arrow->setIcon(icon2);
+        }
+        else
+        {
+            QPixmap pix(":/Icons/Arrow_s_straight.PNG");
+            QIcon icon(pix);
+            ui->pb_SolarDnArrow->setIcon(icon);
+            QPixmap pix2(":/Icons/Arrow_s_Hstraight.PNG");
+            QIcon icon2(pix2);
+            ui->pb_ChargeControler_Arrow->setIcon(icon2);
+        }
 
-//on_pb_PowerButton_clicked();    // toggle light
+//****** UPDATE PSOC ********************
+//BATTERY
+    voltage = psoc.getBatteryVoltageAverage(); // **************** FIX THIS. AVERAGING ISN'T WORKING. THERES TOO MUCH VARIATION ON MEASUREMENTS.
+        //voltage = chargeController.getBattVoltage();
+    ui->lbl_BatteryVoltage->setText(QString::number(voltage, 'f', 2) + " V");
+        current = psoc.getBatteryCurrentAverage() ;
+    ui->lbl_BatteryCurrent->setText(QString::number(current, 'f', 2) + " A");
+    ui->lbl_BatteryPower->setText(QString::number(voltage * current, 'f', 2) + " W");
+        if(current < -1)
+        {
+            QPixmap pix(":/Icons/Arrow_s_Down.PNG");
+            QIcon icon(pix);
+            ui->pb_Battery_Arrow->setIcon(icon);
+            ui->lbl_BatteryCharging->setText("Discharging");
+        }
+        else if (current > 1)
+        {
+            QPixmap pix(":/Icons/Arrow_s_Up.PNG");
+            QIcon icon(pix);
+            ui->pb_Battery_Arrow->setIcon(icon);
+            ui->lbl_BatteryCharging->setText("Charging");
+        }
+        else
+        {
+            QPixmap pix(":/Icons/Arrow_s_straight.PNG");
+            QIcon icon(pix);
+            ui->pb_Battery_Arrow->setIcon(icon);
+            ui->lbl_BatteryCharging->setText(" ");
+        }
+//LOAD
+        current = psoc.getLoadCurrentAverage() *-1;
+    ui->lbl_LoadCurrent->setText(QString::number(current, 'f', 2) + " A");
+        voltage = psoc.getLoadVoltageAverage();
+    ui->lbl_LoadVoltage->setText(QString::number(voltage, 'f', 2) + " V");
+    ui->lbl_LoadPower->setText(QString::number(voltage * current, 'f', 2) + " W");
+        if(current > 1)
+        {
+            QPixmap pix(":/Icons/Arrow_M_Right.PNG");
+            QIcon icon(pix);
+            ui->pb_Load_Arrow->setIcon(icon);
+        }
+        else
+        {
+            QPixmap pix(":/Icons/Arrow_M_HStraight.PNG");
+            QIcon icon(pix);
+            ui->pb_Load_Arrow->setIcon(icon);
+        }
 
-        //ui->lbl_BatteryVoltage->setText(QString::number( psoc->getBatteryVoltage() ));
-    ui->lbl_BatteryVoltage->setText(QString::number( chargeController.getBattVoltage() ) + " V");
-    ui->lbl_BatteryCurrent->setText(QString::number( psoc.getBatteryCurrent() ) + " A");
-    ui->lbl_BatteryPower->setText(QString::number( chargeController.getBattVoltage() * chargeController.getChargingCurrent() ) + " W");
+// EXTERNAL
+        current = psoc.getExternalCurrentAverage() *-1;
+    ui->lbl_ExternalCurrent->setText(QString::number(current, 'f', 2) + " A");
+        voltage = psoc.getExternalVoltage();
+    ui->lbl_ExternalVoltage->setText(QString::number(voltage, 'f', 2) + " V");
+    ui->lbl_ExternalPower->setText(QString::number(voltage * current, 'f', 2) + " W");
+        if(current > 1)
+        {
+            QPixmap pix(":/Icons/Arrow_s_Down.PNG");
+            QIcon icon(pix);
+            ui->pb_External_Arrow->setIcon(icon);
+        }
+        else if (current < -1)
+        {
+            QPixmap pix(":/Icons/Arrow_s_Up.PNG");
+            QIcon icon(pix);
+            ui->pb_External_Arrow->setIcon(icon);
+        }
+        else
+        {
+            QPixmap pix(":/Icons/Arrow_s_straight.PNG");
+            QIcon icon(pix);
+            ui->pb_External_Arrow->setIcon(icon);
+        }
+//SOLAR PANELS
+    ui->lbl_SolarPanelVoltage_1->setText( QString::number( psoc.getSolPanel1Average(), 'f', 2 ) + " V");
+    ui->lbl_SolarPanelVoltage_2->setText( QString::number( psoc.getSolPanel2Average(), 'f', 2 ) + " V");
+    ui->lbl_SolarPanelVoltage_3->setText( QString::number( psoc.getSolPanel3Average(), 'f', 2 ) + " V");
+    ui->lbl_SolarPanelVoltage_4->setText( QString::number( psoc.getSolPanel4Average(), 'f', 2 ) + " V");
 
-    ui->lbl_SolarPanelVoltage->setText(QString::number( chargeController.getPVInputVoltage() ) + " V");
-    ui->lbl_SolarPanelCurrent->setText(QString::number( chargeController.getChargingCurrent1() ) + " A"); // check to see if this is the correct value
-//on_pb_PowerButton_clicked();
-    ui->lbl_ChargerCurrent->setText(QString::number( chargeController.getChargingCurrent() ) + " A");
-    ui->lbl_ChargeControllerPower->setText(QString::number( chargeController.getChargingPower() ) + " W");
-
-    ui->lbl_ExternalCurrent->setText(QString::number( psoc.getExternalCurrent() ) + " A");
-    ui->lbl_ExternalVoltage->setText(QString::number( psoc.getExternalVoltage() ) + " V");
-    ui->lbl_ExternalPower->setText(QString::number( psoc.getExternalCurrent() * psoc.getExternalVoltage() ) + " W");
-//on_pb_PowerButton_clicked();
-    ui->lbl_LoadCurrent->setText(QString::number( psoc.getLoadCurrent() ) + " A");
-    ui->lbl_LoadVoltage->setText(QString::number( psoc.getLoadVoltage() ) + " V");
-    ui->lbl_LoadPower->setText(QString::number( psoc.getLoadCurrent() * psoc.getLoadVoltage() ) + " W");
-
-    ui->lbl_SolarPanelVoltage_1->setText( QString::number( psoc.getSolPanel1() ) + " V");
-    ui->lbl_SolarPanelVoltage_2->setText( QString::number( psoc.getSolPanel2() ) + " V");
-    ui->lbl_SolarPanelVoltage_3->setText( QString::number( psoc.getSolPanel3() ) + " V");
-    ui->lbl_SolarPanelVoltage_4->setText( QString::number( psoc.getSolPanel4() ) + " V");
-
-    //QPixmap pix(":/Icons/Battery/Battery17.png");
-    //QIcon icon(pix);
-    //ui->pb_Battery->setIcon(icon);
-
-    // update battery display
-     //temp -= 5;
-     //temp = 30;
-     //Set_Battery_Display( Get_Battery_Percentage( psoc.getBatteryVoltage() ));
-     Set_Battery_Display( Get_Battery_Percentage( chargeController.getBattVoltage() ));
-
-
+//UPDATE BATTERY DISPLAY
+     Set_Battery_Display( Get_Battery_Percentage( psoc.getBatteryVoltageAverage() ));
+     //Set_Battery_Display( Get_Battery_Percentage( chargeController.getBattVoltage() ));
 }
 
+
+// ***************************************
+// *     BATTERY DISPLAY FUNCTIONS       *
+// ***************************************
 int16_t MainWindow::Get_Battery_Percentage(float batteryVoltage)
 {
     // the range of percentage is 110-10%
     int16_t percentage = 110;
-    if(batteryVoltage < 13.00)
+    if(batteryVoltage < 13.20)
         percentage = 105;
     if(batteryVoltage < 12.87)
         percentage = 100;
@@ -153,8 +242,7 @@ int16_t MainWindow::Get_Battery_Percentage(float batteryVoltage)
         percentage = 20;
     if(batteryVoltage < 11.66)
         percentage = 10;
-
-    return percentage;
+return percentage;
 }
 
 void MainWindow::Set_Battery_Display(int16_t batteryPercentage)
@@ -164,7 +252,7 @@ void MainWindow::Set_Battery_Display(int16_t batteryPercentage)
     {
         case 110:
             fileName = ":/Icons/Battery/Battery17.png";
-            ui->lbl_BatteryPercentage->setText("Charging");
+            ui->lbl_BatteryPercentage->setText("+100%");
             break;
         case 105:
             fileName = ":/Icons/Battery/Battery16.png";
@@ -244,6 +332,9 @@ void MainWindow::Set_Battery_Display(int16_t batteryPercentage)
     ui->pb_Battery->setIcon(icon);
 }
 
+//**********************************
+//*    DISPLAY TEXT FUNCTIONS      *
+//**********************************
 void MainWindow::WarningText(QString text)
 {
     ui->textLoggerBox->setTextColor(QColor("dark orange"));
@@ -273,6 +364,12 @@ void MainWindow::WriteText2Box(QString text)
 }
 
 
+
+//**********************************
+//*    BUTTON PRESS FUNCTIONS      *
+//**********************************
+
+//  POWER BUTTON CLICK
 void MainWindow::on_pb_PowerButton_clicked()
 {
     if(gui_PowerButton_isOn)
@@ -302,7 +399,32 @@ void MainWindow::on_pb_PowerButton_clicked()
     }
 
 }
+// SUN SOLAR CLICK
+void MainWindow::on_pb_SunSolar_clicked()
+{
+    SolarPanel_ConfigPage solar;
+    solar.setModal(true);
+    solar.exec();
 
+}
+// SOLAR TRACKER CLICK
+void MainWindow::on_pb_SolarTrackerOnOff_clicked()
+{
+    if(gui_SolarTracker_isOn)
+    {
+        gui_SolarTracker_isOn = OFF;
+        QPixmap pix(":/Icons/Off.png");
+        QIcon icon(pix);
+        ui->pb_SolarTrackerOnOff->setIcon(icon);
+    }
+    else
+    {
+        gui_SolarTracker_isOn = ON;
+        QPixmap pix(":/Icons/On.png");
+        QIcon icon(pix);
+        ui->pb_SolarTrackerOnOff->setIcon(icon);
+    }
+}
 
 
 
@@ -400,10 +522,4 @@ void MainWindow::on_pb_External_Arrow_clicked()
     }
 }
 
-void MainWindow::on_pb_SunSolar_clicked()
-{
-    SolarPanel_ConfigPage solar;
-    solar.setModal(true);
-    solar.exec();
 
-}

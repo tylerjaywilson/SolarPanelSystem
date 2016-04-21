@@ -11,7 +11,6 @@
         <file>ArrowL_SolarTracker.png</file>
         <file>ArrowR_Config.png</file>
         <file>Arrow_L_Down.PNG</file>
-        <file>Arrow_L_HStraight.PNG</file>
         <file>Arrow_L_Left.PNG</file>
         <file>Arrow_L_Right.PNG</file>
         <file>Arrow_L_Straight.PNG</file>
@@ -22,9 +21,10 @@
         <file>Arrow_M_Right.PNG</file>
         <file>Arrow_M_Straight.PNG</file>
         <file>Arrow_M_Up.PNG</file>
-        <file>Arrow_s_Down.PNG</file>
         <file>Arrow_s_Hstraight.PNG</file>
         <file>Arrow_s_Left.PNG</file>
+        <file>Arrow_L_HStraight.PNG</file>
+        <file>Arrow_s_Down.PNG</file>
         <file>Arrow_s_Right.PNG</file>
         <file>Arrow_s_straight.PNG</file>
         <file>Arrow_s_Up.PNG</file>

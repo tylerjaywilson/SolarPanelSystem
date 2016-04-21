@@ -13,7 +13,7 @@
 #define			M10A_2_A			100
 #define			TX_MAX_BUFF			5
 #define			BITS8				8
-#define			GET_LOW_BYTE		0x0F
+#define			GET_LOW_BYTE		0xFF
 
 //Default Constructor
 PSOCComm::PSOCComm()
@@ -387,7 +387,7 @@ void    PSOCComm::setExternalVoltageGain(float externalVoltageGain_t)
 	unsigned char tx_buff[TX_MAX_BUFF] = {0};
 
 	//Store float into the tx_buff array as a high and low byte
-	float2Chars(externalVoltageGain, tx_buff);
+    float2Chars(externalVoltageGain_t, tx_buff);
 
 	//Write the value to the PSoC
 	i2c0.write16(I2C_EXT_V_GAIN_LBYTE, tx_buff);

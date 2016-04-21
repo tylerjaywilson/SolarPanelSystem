@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>480</height>
+    <width>827</width>
+    <height>492</height>
    </rect>
   </property>
   <property name="font">
@@ -78,9 +78,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>194</y>
+      <y>184</y>
       <width>31</width>
-      <height>101</height>
+      <height>111</height>
      </rect>
     </property>
     <property name="text">
@@ -88,12 +88,12 @@
     </property>
     <property name="icon">
      <iconset resource="myResources.qrc">
-      <normaloff>:/Icons/Down Arrow.PNG</normaloff>:/Icons/Down Arrow.PNG</iconset>
+      <normaloff>:/Icons/Arrow_s_straight.PNG</normaloff>:/Icons/Arrow_s_straight.PNG</iconset>
     </property>
     <property name="iconSize">
      <size>
-      <width>62</width>
-      <height>111</height>
+      <width>73</width>
+      <height>116</height>
      </size>
     </property>
     <property name="flat">
@@ -103,10 +103,10 @@
    <widget class="QPushButton" name="pb_ChargeControler_Arrow">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>330</y>
-      <width>141</width>
-      <height>41</height>
+      <x>104</x>
+      <y>333</y>
+      <width>156</width>
+      <height>38</height>
      </rect>
     </property>
     <property name="text">
@@ -114,11 +114,11 @@
     </property>
     <property name="icon">
      <iconset resource="myResources.qrc">
-      <normaloff>:/Icons/ChargeController_LeftArrow.PNG</normaloff>:/Icons/ChargeController_LeftArrow.PNG</iconset>
+      <normaloff>:/Icons/Arrow_s_Hstraight.PNG</normaloff>:/Icons/Arrow_s_Hstraight.PNG</iconset>
     </property>
     <property name="iconSize">
      <size>
-      <width>129</width>
+      <width>148</width>
       <height>129</height>
      </size>
     </property>
@@ -129,10 +129,10 @@
    <widget class="QPushButton" name="pb_Battery_Arrow">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>220</y>
-      <width>21</width>
-      <height>129</height>
+      <x>242</x>
+      <y>221</y>
+      <width>31</width>
+      <height>114</height>
      </rect>
     </property>
     <property name="text">
@@ -140,7 +140,7 @@
     </property>
     <property name="icon">
      <iconset resource="myResources.qrc">
-      <normaloff>:/Icons/Battery_Bidirectional_Arrow.PNG</normaloff>:/Icons/Battery_Bidirectional_Arrow.PNG</iconset>
+      <normaloff>:/Icons/Arrow_s_straight.PNG</normaloff>:/Icons/Arrow_s_straight.PNG</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -201,9 +201,9 @@
    <widget class="QLabel" name="lbl_BatteryVoltage">
     <property name="geometry">
      <rect>
-      <x>296</x>
+      <x>300</x>
       <y>120</y>
-      <width>91</width>
+      <width>81</width>
       <height>30</height>
      </rect>
     </property>
@@ -217,12 +217,15 @@
     <property name="text">
      <string>12.5 V</string>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
    </widget>
    <widget class="QLabel" name="lbl_ChargeControllerPower">
     <property name="geometry">
      <rect>
-      <x>113</x>
-      <y>300</y>
+      <x>110</x>
+      <y>303</y>
       <width>91</width>
       <height>30</height>
      </rect>
@@ -237,39 +240,16 @@
     <property name="text">
      <string>+750 W</string>
     </property>
-   </widget>
-   <widget class="QPushButton" name="pb_Power_Arrow">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>340</y>
-      <width>411</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="myResources.qrc">
-      <normaloff>:/Icons/Power_RighArrow.PNG</normaloff>:/Icons/Power_RighArrow.PNG</iconset>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>400</width>
-      <height>129</height>
-     </size>
-    </property>
-    <property name="flat">
-     <bool>true</bool>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QPushButton" name="pb_External_Arrow">
     <property name="geometry">
      <rect>
-      <x>483</x>
-      <y>202</y>
-      <width>21</width>
+      <x>473</x>
+      <y>203</y>
+      <width>31</width>
       <height>133</height>
      </rect>
     </property>
@@ -278,12 +258,12 @@
     </property>
     <property name="icon">
      <iconset resource="myResources.qrc">
-      <normaloff>:/Icons/Battery_Bidirectional_Arrow.PNG</normaloff>:/Icons/Battery_Bidirectional_Arrow.PNG</iconset>
+      <normaloff>:/Icons/Arrow_s_straight.PNG</normaloff>:/Icons/Arrow_s_straight.PNG</iconset>
     </property>
     <property name="iconSize">
      <size>
-      <width>129</width>
-      <height>129</height>
+      <width>134</width>
+      <height>135</height>
      </size>
     </property>
     <property name="flat">
@@ -293,7 +273,7 @@
    <widget class="QPushButton" name="pb_External">
     <property name="geometry">
      <rect>
-      <x>451</x>
+      <x>446</x>
       <y>96</y>
       <width>84</width>
       <height>111</height>
@@ -319,9 +299,9 @@
    <widget class="QLabel" name="lbl_ExternalVoltage">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>530</x>
       <y>120</y>
-      <width>91</width>
+      <width>81</width>
       <height>30</height>
      </rect>
     </property>
@@ -335,12 +315,15 @@
     <property name="text">
      <string>14.4 V</string>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
    </widget>
    <widget class="QLabel" name="lbl_BatteryPower">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>300</y>
+      <x>270</x>
+      <y>303</y>
       <width>91</width>
       <height>30</height>
      </rect>
@@ -355,13 +338,16 @@
     <property name="text">
      <string>+505 W</string>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
    </widget>
    <widget class="QLabel" name="lbl_ExternalPower">
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>300</y>
-      <width>101</width>
+      <y>303</y>
+      <width>91</width>
       <height>30</height>
      </rect>
     </property>
@@ -375,13 +361,16 @@
     <property name="text">
      <string>+406 W</string>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
    </widget>
    <widget class="QLabel" name="lbl_LoadPower">
     <property name="geometry">
      <rect>
-      <x>690</x>
-      <y>290</y>
-      <width>101</width>
+      <x>680</x>
+      <y>303</y>
+      <width>111</width>
       <height>30</height>
      </rect>
     </property>
@@ -394,6 +383,9 @@
     </property>
     <property name="text">
      <string>-1004 W</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QPushButton" name="pb_PowerButton">
@@ -454,11 +446,14 @@
     </property>
    </widget>
    <widget class="QLabel" name="lbl_SolarPanelCurrent">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>62</x>
-      <y>267</y>
-      <width>61</width>
+      <x>60</x>
+      <y>230</y>
+      <width>71</width>
       <height>20</height>
      </rect>
     </property>
@@ -472,13 +467,16 @@
     <property name="text">
      <string>5.3 A</string>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
    </widget>
    <widget class="QLabel" name="lbl_SolarPanelVoltage">
     <property name="geometry">
      <rect>
-      <x>56</x>
-      <y>203</y>
-      <width>71</width>
+      <x>50</x>
+      <y>200</y>
+      <width>81</width>
       <height>22</height>
      </rect>
     </property>
@@ -492,33 +490,16 @@
     <property name="text">
      <string>100 V</string>
     </property>
-   </widget>
-   <widget class="QLabel" name="lbl_ChargerVoltage">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>400</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="text">
-     <string>14.4 V</string>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="lbl_ChargerCurrent">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>370</y>
-      <width>71</width>
+      <x>114</x>
+      <y>280</y>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -532,14 +513,17 @@
     <property name="text">
      <string>50.4 A</string>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
    </widget>
    <widget class="QLabel" name="lbl_LoadVoltage">
     <property name="geometry">
      <rect>
-      <x>710</x>
-      <y>330</y>
+      <x>709</x>
+      <y>336</y>
       <width>81</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="font">
@@ -552,13 +536,16 @@
     <property name="text">
      <string>14.4 V</string>
     </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
    </widget>
    <widget class="QLabel" name="lbl_LoadCurrent">
     <property name="geometry">
      <rect>
-      <x>710</x>
-      <y>360</y>
-      <width>81</width>
+      <x>700</x>
+      <y>362</y>
+      <width>91</width>
       <height>21</height>
      </rect>
     </property>
@@ -570,15 +557,18 @@
      </font>
     </property>
     <property name="text">
-     <string>50.4 A</string>
+     <string>250.4 A</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="lbl_BatteryCurrent">
     <property name="geometry">
      <rect>
-      <x>280</x>
+      <x>270</x>
       <y>230</y>
-      <width>93</width>
+      <width>91</width>
       <height>31</height>
      </rect>
     </property>
@@ -590,7 +580,10 @@
      </font>
     </property>
     <property name="text">
-     <string>50.4 A</string>
+     <string>250.4 A</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="lbl_ExternalCurrent">
@@ -598,7 +591,7 @@
      <rect>
       <x>510</x>
       <y>230</y>
-      <width>82</width>
+      <width>91</width>
       <height>31</height>
      </rect>
     </property>
@@ -610,15 +603,18 @@
      </font>
     </property>
     <property name="text">
-     <string>50.4 A</string>
+     <string>250.4 A</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
     </property>
    </widget>
    <widget class="QLabel" name="lbl_SolarPanelVoltage_4">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>110</x>
       <y>160</y>
-      <width>41</width>
+      <width>61</width>
       <height>20</height>
      </rect>
     </property>
@@ -634,9 +630,9 @@
    <widget class="QLabel" name="lbl_SolarPanelVoltage_3">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>110</x>
       <y>140</y>
-      <width>45</width>
+      <width>61</width>
       <height>22</height>
      </rect>
     </property>
@@ -652,9 +648,9 @@
    <widget class="QLabel" name="lbl_SolarPanelVoltage_1">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>110</x>
       <y>100</y>
-      <width>45</width>
+      <width>61</width>
       <height>22</height>
      </rect>
     </property>
@@ -670,9 +666,9 @@
    <widget class="QLabel" name="lbl_SolarPanelVoltage_2">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>110</x>
       <y>120</y>
-      <width>45</width>
+      <width>61</width>
       <height>22</height>
      </rect>
     </property>
@@ -688,7 +684,7 @@
    <widget class="QLabel" name="lbl_SolarPanelVoltage_7">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>170</x>
       <y>140</y>
       <width>45</width>
       <height>22</height>
@@ -706,7 +702,7 @@
    <widget class="QLabel" name="lbl_SolarPanelVoltage_6">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>170</x>
       <y>120</y>
       <width>45</width>
       <height>22</height>
@@ -724,7 +720,7 @@
    <widget class="QLabel" name="lbl_SolarPanelVoltage_8">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>170</x>
       <y>160</y>
       <width>45</width>
       <height>22</height>
@@ -742,7 +738,7 @@
    <widget class="QLabel" name="lbl_SolarPanelVoltage_5">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>170</x>
       <y>100</y>
       <width>45</width>
       <height>22</height>
@@ -788,7 +784,7 @@
      <rect>
       <x>160</x>
       <y>0</y>
-      <width>451</width>
+      <width>471</width>
       <height>43</height>
      </rect>
     </property>
@@ -1008,7 +1004,7 @@
      <rect>
       <x>10</x>
       <y>42</y>
-      <width>65</width>
+      <width>101</width>
       <height>19</height>
      </rect>
     </property>
@@ -1070,20 +1066,200 @@
    <widget class="QTextBrowser" name="textLoggerBox">
     <property name="geometry">
      <rect>
-      <x>265</x>
+      <x>215</x>
       <y>370</y>
-      <width>401</width>
+      <width>451</width>
       <height>81</height>
      </rect>
     </property>
    </widget>
+   <widget class="QLabel" name="lbl_BatteryCharging">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>180</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+      <kerning>true</kerning>
+     </font>
+    </property>
+    <property name="text">
+     <string>Discharging</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_SolarTrackerOnOff">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>385</y>
+      <width>76</width>
+      <height>70</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="myResources.qrc">
+      <normaloff>:/Icons/Off.png</normaloff>
+      <normalon>:/Icons/On.png</normalon>
+      <selectedon>:/Icons/Off.png</selectedon>:/Icons/Off.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>62</width>
+      <height>62</height>
+     </size>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="txt_SolarChargeController_1">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>370</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Solar Tracker</string>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_Load_Arrow">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>335</y>
+      <width>211</width>
+      <height>35</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="myResources.qrc">
+      <normaloff>:/Icons/Arrow_M_HStraight.PNG</normaloff>:/Icons/Arrow_M_HStraight.PNG</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>193</width>
+      <height>136</height>
+     </size>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pb_Power_Arrow_2">
+    <property name="geometry">
+     <rect>
+      <x>252</x>
+      <y>335</y>
+      <width>241</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="myResources.qrc">
+      <normaloff>:/Icons/Arrow_L_HStraight.PNG</normaloff>:/Icons/Arrow_L_HStraight.PNG</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>233</width>
+      <height>143</height>
+     </size>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <zorder>lbl_BatteryCharging</zorder>
+   <zorder>lbl_ExternalVoltage</zorder>
+   <zorder>pb_SunSolar</zorder>
+   <zorder>pb_ChargeController</zorder>
+   <zorder>pb_SolarDnArrow</zorder>
+   <zorder>pb_ChargeControler_Arrow</zorder>
+   <zorder>pb_Battery_Arrow</zorder>
+   <zorder>lbl_BatteryPercentage</zorder>
+   <zorder>pb_Battery</zorder>
+   <zorder>lbl_BatteryVoltage</zorder>
+   <zorder>lbl_ChargeControllerPower</zorder>
+   <zorder>pb_External_Arrow</zorder>
+   <zorder>pb_External</zorder>
+   <zorder>lbl_BatteryPower</zorder>
+   <zorder>lbl_ExternalPower</zorder>
+   <zorder>lbl_LoadPower</zorder>
+   <zorder>pb_PowerButton</zorder>
+   <zorder>pb_LightBulb</zorder>
+   <zorder>lbl_SolarPanelCurrent</zorder>
+   <zorder>lbl_SolarPanelVoltage</zorder>
+   <zorder>lbl_ChargerCurrent</zorder>
+   <zorder>lbl_LoadVoltage</zorder>
+   <zorder>lbl_LoadCurrent</zorder>
+   <zorder>lbl_BatteryCurrent</zorder>
+   <zorder>lbl_ExternalCurrent</zorder>
+   <zorder>lbl_SolarPanelVoltage_4</zorder>
+   <zorder>lbl_SolarPanelVoltage_3</zorder>
+   <zorder>lbl_SolarPanelVoltage_1</zorder>
+   <zorder>lbl_SolarPanelVoltage_2</zorder>
+   <zorder>lbl_SolarPanelVoltage_7</zorder>
+   <zorder>lbl_SolarPanelVoltage_6</zorder>
+   <zorder>lbl_SolarPanelVoltage_8</zorder>
+   <zorder>lbl_SolarPanelVoltage_5</zorder>
+   <zorder>pb_LeftArrow</zorder>
+   <zorder>pb_RightArrow</zorder>
+   <zorder>txt_PowerOut_</zorder>
+   <zorder>txt_Inverter_</zorder>
+   <zorder>txt_BatteryChargers_</zorder>
+   <zorder>txt_DCDCconverters_</zorder>
+   <zorder>txt_ExternalPower_</zorder>
+   <zorder>txt_Terminals_</zorder>
+   <zorder>txt_PowerStorage_</zorder>
+   <zorder>txt_BatteryBank_</zorder>
+   <zorder>txt_PowerIn_</zorder>
+   <zorder>txt_SolarPanels_</zorder>
+   <zorder>txt_SolarChargeController_</zorder>
+   <zorder>textLoggerBox</zorder>
+   <zorder>txt_CompLogo_</zorder>
+   <zorder>pb_SolarTrackerOnOff</zorder>
+   <zorder>txt_SolarChargeController_1</zorder>
+   <zorder>pb_Load_Arrow</zorder>
+   <zorder>pb_Power_Arrow_2</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>827</width>
      <height>24</height>
     </rect>
    </property>

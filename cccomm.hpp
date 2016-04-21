@@ -135,7 +135,15 @@ class CCComm{
   unsigned char rx_buffer[RX_LENGTH_MAX];   
 
   //Function used for determining if the parameters of the charge controller need to be updated
-  bool updateParameters();   //Return true if the data needs updating
+  bool commTimeout();   //Return true if the data needs updating
+  bool isUpToDateQPI;
+  bool isUpToDateQID;
+  bool isUpToDateQPIRI;
+  bool isUpToDateQPIGS;
+  bool isUpToDateQDI;
+  bool isUpToDateQPIWS;
+  bool isUpToDateQBEQI;
+  bool chargeControllerIsOn;
 
 public:
   CCComm();   //Default constructor
@@ -156,7 +164,10 @@ public:
   void setBattEqualizedVoltage(float);      
   void setBattCVChargeTime(int);        
   void setTimeBatteryEqualizedTimeout(int);   
-  
+
+  void clearIsUpToDate();
+  void setChargeControolerIsOn(bool);
+
   /******Get functions*******/
   //QID
   std::string getSerialNum();
@@ -221,6 +232,8 @@ public:
   float getBattEqualizedVoltage();
   int   getBattCVChargeTime();
   int   getBattEqualizedTimeout();    
+
+  bool  getChargeControllerIsOn();
 };
 
 #endif

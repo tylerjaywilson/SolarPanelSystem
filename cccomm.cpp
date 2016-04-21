@@ -28,7 +28,7 @@
 #define 		NUM_BYTES3 					3
 #define 		NUM_BYTES5 					5
 #define 		NUM_BYTES6 					6
-#define		NUM_BYTES7					7
+#define         NUM_BYTES7					7
 #define 		NUM_BYTES8 					8
 #define 		NUM_BYTES9 					9
 #define 		NUM_BYTES10					10
@@ -53,7 +53,8 @@
 #define 		INTEGER_BASE 				10
 
 //Used for timing - Updating the charge controller parameters
-#define 		ONESECOND 					1.0
+#define 		TWOHUNDREDMS			200
+#define         CONVERTMS				1000
 
 //Lengths of received arrays after sending an inquiry
 #define 		RX_BUFF_MAX 				255
@@ -340,7 +341,9 @@ CCComm::CCComm()
 	/******************RECEIVE VARIABLES********************/
 
 	//Initialze buffer to zero
-	rx_buffer[0] = {0};
+//**** CHANGED. THIS LINE DOESN'T INITIALIZE TO ZEROS	rx_buffer[0] = {0};
+    for (int i = 0; i< RX_LENGTH_MAX; i++)
+    {   rx_buffer[i] = 0;   }
 	
 	/* Serial number */
 	serialNum = "-1";
@@ -413,7 +416,15 @@ CCComm::CCComm()
 	receivedCRC = -1;
 
 	//Timeout variable 
-    startTime = clock();
+	startTime = clock();
+    isUpToDateQPI = false;
+    isUpToDateQID = false;
+    isUpToDateQPIRI = false;
+    isUpToDateQPIGS = false;
+    isUpToDateQDI = false;
+    isUpToDateQPIWS = false;
+    isUpToDateQBEQI = false;
+    chargeControllerIsOn = true;
 }
 
 
@@ -820,7 +831,7 @@ bool CCComm::parseACKNACK(unsigned char *rx_buffer_t)
 }
 
 // Determine if the data is older than one second and return true if an update is needed
-bool CCComm::updateParameters()
+bool CCComm::commTimeout()
 {
     float elapsedTime = 0;
     float starttime = (float) getStartTime();
@@ -833,10 +844,9 @@ bool CCComm::updateParameters()
     elapsedTime = curtime-starttime;
 	//printf("Elapsed Time: %f\n", (elapsedTime/CLOCKS_PER_SEC));
 
-    //See if more than one second has elapsed
-    if( (elapsedTime/CLOCKS_PER_SEC) > ONESECOND )
+    //See if more than 200 ms has elapsed
+    if( ((elapsedTime/CLOCKS_PER_SEC)*CONVERTMS) > 500 ) // 1000 ms
     {
-        setStartTime(clock());	//Update the new start time
         return true;
     }
     else
@@ -927,9 +937,11 @@ void CCComm::uartRead(int readType)
 {
 	int rx_length, tot_length = 0;	//Need to use this for error detection
 	bool finishedReading = false;
+    bool timeoutOccurred = false;
+	setStartTime(clock());	//Update the new start time
 
 	//Continue reading incoming data until the expected limit is reached
-	while(!finishedReading)
+    while(!finishedReading && !timeoutOccurred)
 	{
 		//Which type of read are we expecting to have
 		switch(readType)
@@ -1105,6 +1117,17 @@ void CCComm::uartRead(int readType)
 			default:
 				printf("Error: Read Type!\n");
 		}
+		//Check to see if the communication is no longer working between the RaPi and Charge Controller - Charge Controller may be off
+		timeoutOccurred = commTimeout();
+		if(timeoutOccurred)
+		{
+            chargeControllerIsOn = false;
+			printf("Timeout Occurred: No longer communicating with the Charge Controller\n");
+		}
+        else
+        {
+            chargeControllerIsOn = true;
+        }
 	}
 }
 
@@ -1112,524 +1135,571 @@ void CCComm::uartRead(int readType)
 
 std::string CCComm::getSerialNum()
 {
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+    if(!isUpToDateQID)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(SERIAL_NUM);
-		uartRead(SERIAL_NUM);
+        uartRead(SERIAL_NUM);
+        isUpToDateQPI = true;
 	}	
 	return serialNum;
 }
 int CCComm::getMaxOutputPower()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
-		uartRead(RATED_INFO);
-	}	
+        uartRead(RATED_INFO);
+        isUpToDateQPIRI = true;
+    }
 	return maxOutputPower;
 }
 int CCComm::getNominalBattVoltage()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
-	}	
+        isUpToDateQPIRI = true;
+    }
 	return nominalBattVoltage;
 }
 float CCComm::getNominalChargingCurrent()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
-	}	
+        isUpToDateQPIRI = true;
+    }
 	return nominalChargingCurrent;
 }
 float CCComm::getAbsorptionVoltage()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
-	}	
+        isUpToDateQPIRI = true;
+    }
 	return absorptionVoltage;
 }
 float CCComm::getFloatVoltage()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
-	}	
+        isUpToDateQPIRI = true;
+    }
 	return floatVoltage;
 }
 int CCComm::getBattType()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
-	}	
+        isUpToDateQPIRI = true;
+    }
 	return battType;
 }
 int CCComm::getRemoteBattVoltageDetect()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
+        isUpToDateQPIRI = true;
 	}	
+    if(!chargeControllerIsOn)
+        remoteBattVoltageDetect = 0;
 	return remoteBattVoltageDetect;
 }
 float CCComm::getBattTempCompensation()
 {
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
+        isUpToDateQPIRI = true;
 	}	
 	return battTempCompensation;
 }
 int CCComm::getRemoteTempDetect()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
+        isUpToDateQPIRI = true;
 	}	
 	return remoteTempDetect;
 }
 int CCComm::getBattRatedVoltageSet()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
+        isUpToDateQPIRI = true;
 	}	
 	return battRatedVoltageSet;
 }
 int CCComm::getBattInSerial()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
+        isUpToDateQPIRI = true;
 	}	
 	return battInSerial;
 }
 float CCComm::getBattLowWarningVoltage()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
+        isUpToDateQPIRI = true;
 	}	
 	return battLowWarningVoltage;
 }
 int CCComm::getBattLowShutdownDetect()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIRI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(RATED_INFO);
 		uartRead(RATED_INFO);
+        isUpToDateQPIRI = true;
 	}	
 	return battLowShutdownDetect;
 }
 float CCComm::getPVInputVoltage()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIGS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(GENERAL_STATUS);
 		uartRead(GENERAL_STATUS);
+        isUpToDateQPIGS = true;
 	}	
+    if(!chargeControllerIsOn)
+    {
+        pvInputVoltage = 0;
+    }
 	return pvInputVoltage;
 }
 float CCComm::getBattVoltage()
 {
-    bool update;// = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+    if(!isUpToDateQPIGS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(GENERAL_STATUS);
 		uartRead(GENERAL_STATUS);
+        isUpToDateQPIGS = true;
 	}	
+    if(!chargeControllerIsOn)
+    {
+        battVoltage = 0;
+    }
 	return battVoltage;
 }
 float CCComm::getChargingCurrent()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIGS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(GENERAL_STATUS);
 		uartRead(GENERAL_STATUS);
+        isUpToDateQPIGS = true;
 	}	
+    if(!chargeControllerIsOn)
+    {
+        chargingCurrent = 0;
+    }
 	return chargingCurrent;
 }
 float CCComm::getChargingCurrent1()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIGS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(GENERAL_STATUS);
 		uartRead(GENERAL_STATUS);
-	}	
+        isUpToDateQPIGS = true;
+    }
+    if(!chargeControllerIsOn)
+    {
+        chargingCurrent1 = 0;
+    }
 	return chargingCurrent1;
 }
 float CCComm::getChargingCurrent2()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIGS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(GENERAL_STATUS);
 		uartRead(GENERAL_STATUS);
+        isUpToDateQPIGS = true;
 	}	
+    if(!chargeControllerIsOn)
+    {
+        chargingCurrent2 = 0;
+    }
 	return chargingCurrent2;
 }
 int CCComm::getChargingPower()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIGS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(GENERAL_STATUS);
 		uartRead(GENERAL_STATUS);
-	}	
+        isUpToDateQPIGS = true;
+    }
+    if(!chargeControllerIsOn)
+    {
+        chargingPower = 0;
+    }
 	return chargingPower;
 }
 int CCComm::getUnitTemp()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIGS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(GENERAL_STATUS);
 		uartRead(GENERAL_STATUS);
+        isUpToDateQPIGS = true;
 	}	
+    if(!chargeControllerIsOn)
+    {
+        unitTemp = 0;
+    }
 	return unitTemp;
 }
 float CCComm::getRemoteBattVoltage()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIGS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(GENERAL_STATUS);
 		uartRead(GENERAL_STATUS);
+        isUpToDateQPIGS = true;
 	}	
+    if(!chargeControllerIsOn)
+    {
+        remoteBattVoltage = 0;
+    }
 	return remoteBattVoltage;
 }
 int CCComm::getRemoteBattTemp()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIGS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(GENERAL_STATUS);
 		uartRead(GENERAL_STATUS);
+        isUpToDateQPIGS = true;
 	}	
+    if(!chargeControllerIsOn)
+    {
+        remoteBattTemp = 0;
+    }
 	return remoteBattTemp;
 }
 int CCComm::getStatus()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIGS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(GENERAL_STATUS);
 		uartRead(GENERAL_STATUS);
+        isUpToDateQPIGS = true;
 	}	
 	return status;
 }
 int CCComm::getOverChargeCurrent()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
 		uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return overChargeCurrent;
 }
 int CCComm::getOverTemp()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
 		uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return overTemp;
 }
 int CCComm::getBattVoltageUnder()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
-		uartRead(WARNING_STATUS);
+        uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return battVoltageUnder;
 }
 int CCComm::getBattVoltageHigh()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
 		uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return battVoltageHigh;
 }
 int CCComm::getPVHighLoss()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
 		uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return pvHighLoss;
 }
 int CCComm::getBattTempLow()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
 		uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return battTempLow;
 }
 int CCComm::getBattTempHigh()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
 		uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return battTempHigh;
 }
 int CCComm::getPVLowLoss()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
 		uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return pvLowLoss;
 }
 int CCComm::getPVHighDerating()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
 		uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return pvHighDerating;
 }
 int CCComm::getTempHighDerating()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
 		uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return tempHighDerating;
 }
 int CCComm::getBattTempLowAlarm()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
 		uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return battTempLowAlarm;
 }
 int CCComm::getBattLowWarning()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQPIWS)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(WARNING_STATUS);
 		uartRead(WARNING_STATUS);
+        isUpToDateQPIWS = true;
 	}	
 	return battLowWarning;
 }
 int CCComm::getBattEqualizedEn()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQBEQI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(EQUALIZED_INFO);
-		uartRead(EQUALIZED_INFO);
+        uartRead(EQUALIZED_INFO);
+        isUpToDateQBEQI = true;
 	}	
 	return battEqualizedEn;
 }
 int CCComm::getBattEqualizedTime()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQBEQI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(EQUALIZED_INFO);
 		uartRead(EQUALIZED_INFO);
+        isUpToDateQBEQI = true;
 	}	
 	return battEqualizedTime;
 }
 int CCComm::getIntervalTime()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQBEQI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(EQUALIZED_INFO);
 		uartRead(EQUALIZED_INFO);
+        isUpToDateQBEQI = true;
 	}	
 	return intervalTime;
 }
 int CCComm::getMaxCurrent()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQBEQI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(EQUALIZED_INFO);
 		uartRead(EQUALIZED_INFO);
+        isUpToDateQBEQI = true;
 	}	
 	return maxCurrent;
 }
 int CCComm::getRemainingTime()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQBEQI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(EQUALIZED_INFO);
 		uartRead(EQUALIZED_INFO);
+        isUpToDateQBEQI = true;
 	}	
 	return remainingTime;
 }
 float CCComm::getBattEqualizedVoltage()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQBEQI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(EQUALIZED_INFO);
 		uartRead(EQUALIZED_INFO);
+        isUpToDateQBEQI = true;
 	}	
 	return battEqualizedVoltage;
 }
 int CCComm::getBattCVChargeTime()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQBEQI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(EQUALIZED_INFO);
 		uartRead(EQUALIZED_INFO);
+        isUpToDateQBEQI = true;
 	}	
 	return battCVChargeTime;
 }
 int CCComm::getBattEqualizedTimeout()
-{
-	bool update = updateParameters();
-	update = 1;
-	if(update)	//If an update is needed then send the appropriate write command and wait for the receive
+{	
+    if(!isUpToDateQBEQI)	//If an update is needed then send the appropriate write command and wait for the receive
 	{
 		uartWrite(EQUALIZED_INFO);
 		uartRead(EQUALIZED_INFO);
+        isUpToDateQBEQI = true;
 	}	
 	return battEqualizedTimeout;
 }
 int CCComm::getDBattRatedVoltageSet()
 {
+    if(!isUpToDateQDI)	//If an update is needed then send the appropriate write command and wait for the receive
+	{
+		uartWrite(DEFAULT_SETTING);
+		uartRead(DEFAULT_SETTING);
+        isUpToDateQDI = true;
+	}	
 	return d_battRatedVoltageSet;
 }
 float CCComm::getDMaxChargingCurrent()
 {
+    if(!isUpToDateQDI)	//If an update is needed then send the appropriate write command and wait for the receive
+	{
+		uartWrite(DEFAULT_SETTING);
+		uartRead(DEFAULT_SETTING);
+        isUpToDateQDI = true;
+	}
 	return d_maxChargingCurrent;
 }
 int CCComm::getDBattType()
 {
+    if(!isUpToDateQDI)	//If an update is needed then send the appropriate write command and wait for the receive
+	{
+		uartWrite(DEFAULT_SETTING);
+		uartRead(DEFAULT_SETTING);
+        isUpToDateQDI = true;
+	}
 	return d_battType;
 }
 float CCComm::getDAbsorptionVoltage()
 {
+    if(!isUpToDateQDI)	//If an update is needed then send the appropriate write command and wait for the receive
+	{
+		uartWrite(DEFAULT_SETTING);
+		uartRead(DEFAULT_SETTING);
+        isUpToDateQDI = true;
+	}
 	return d_absorbtionVoltage;
 }
 float CCComm::getDFloatingVoltage()
 {
+    if(!isUpToDateQDI)	//If an update is needed then send the appropriate write command and wait for the receive
+	{
+		uartWrite(DEFAULT_SETTING);
+		uartRead(DEFAULT_SETTING);
+        isUpToDateQDI = true;
+	}
 	return d_floatingVoltage;
 }
 int CCComm::getDRemoteBattVoltageDetect()
 {
+    if(!isUpToDateQDI)	//If an update is needed then send the appropriate write command and wait for the receive
+	{
+		uartWrite(DEFAULT_SETTING);
+		uartRead(DEFAULT_SETTING);
+        isUpToDateQDI = true;
+	}
 	return d_remoteBattVoltageDetect;
 }
 float CCComm::getDTempCompensationRatio()
 {
+    if(!isUpToDateQDI)	//If an update is needed then send the appropriate write command and wait for the receive
+	{
+		uartWrite(DEFAULT_SETTING);
+		uartRead(DEFAULT_SETTING);
+        isUpToDateQDI = true;
+	}
 	return d_tempCompensationRatio;
 }
 int CCComm::getDReserved()
 {
+    if(!isUpToDateQDI)	//If an update is needed then send the appropriate write command and wait for the receive
+	{
+		uartWrite(DEFAULT_SETTING);
+		uartRead(DEFAULT_SETTING);
+        isUpToDateQDI = true;
+	}
 	return d_reserved;
 }
 clock_t CCComm::getStartTime()
 {
 	return startTime;
 }
+bool CCComm::getChargeControllerIsOn()
+{
+    return chargeControllerIsOn;
+}
+
 /************************Set functions***************************/
 
 //Set the battery type
@@ -2144,4 +2214,21 @@ void CCComm::setTimeBatteryEqualizedTimeout(int timeout)
 void CCComm::setStartTime(clock_t startTime_t)
 {
 	startTime = startTime_t;
+}
+
+//Set the isUpToDate variable
+void CCComm::clearIsUpToDate()
+{
+    isUpToDateQPI   = false;
+    isUpToDateQID   = false;
+    isUpToDateQPIRI = false;
+    isUpToDateQPIGS = false;
+    isUpToDateQDI   = false;
+    isUpToDateQPIWS = false;
+    isUpToDateQBEQI = false;
+}
+
+void CCComm::setChargeControolerIsOn(bool isOn)
+{
+    chargeControllerIsOn = isOn;
 }

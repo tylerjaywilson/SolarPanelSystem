@@ -13,6 +13,7 @@
 
 #define 	NUM_BYTES1 		1
 #define 	NUM_BYTES2 		2
+#define     NUM_BYTES3      3
 #define 	MAX_RX_BUFF 	5
 
 #define 	BITS8 			8
@@ -50,19 +51,19 @@ void I2C::write8(int address, unsigned char *buffer)
 {
 	unsigned char addressBuff[MAX_RX_BUFF] = {0};
 	addressBuff[0] = (unsigned char) address;
-
-	//First write a byte to indicate which memory location we will be writing to.
-	if (write(filestream, addressBuff, NUM_BYTES1) != NUM_BYTES1)		//write() returns the number of bytes actually written, if it doesn't match then an error occurred (e.g. no response from the device)
+    addressBuff[1] = buffer[0];
+    //First write a byte to indicate which memory location we will be writing to. Followed by the data to write
+    if (write(filestream, addressBuff, NUM_BYTES2) != NUM_BYTES2)		//write() returns the number of bytes actually written, if it doesn't match then an error occurred (e.g. no response from the device)
 	{
 		/* ERROR HANDLING: i2c transaction failed */
 		printf("Failed to write to the i2c bus.\n");
 	}
 	//Write the desired data to the memory location
-	if (write(filestream, buffer, NUM_BYTES1) != NUM_BYTES1)		//write() returns the number of bytes actually written, if it doesn't match then an error occurred (e.g. no response from the device)
-	{
+    //if (write(filestream, buffer, NUM_BYTES1) != NUM_BYTES1)		//write() returns the number of bytes actually written, if it doesn't match then an error occurred (e.g. no response from the device)
+    //{
 		/* ERROR HANDLING: i2c transaction failed */
-		printf("Failed to write to the i2c bus.\n");
-	}
+    //	printf("Failed to write to the i2c bus.\n");
+    //}
 }
 
 //Write a 16 bit value to the PSoC5 slave device - This write value stored in buffer contains the register that we want to 
@@ -71,19 +72,21 @@ void I2C::write16(int address, unsigned char *buffer)
 {
 	unsigned char addressBuff[MAX_RX_BUFF] = {0};
 	addressBuff[0] = (unsigned char) address;
+    addressBuff[1] = buffer[0];
+    addressBuff[2] = buffer[1];
 
-	//First write a byte to indicate which memory location we will be writing to.
-	if (write(filestream, addressBuff, NUM_BYTES1) != NUM_BYTES1)		//write() returns the number of bytes actually written, if it doesn't match then an error occurred (e.g. no response from the device)
+    //First write a byte to indicate which memory location we will be writing to. Then followed by 2 bytes of data
+    if (write(filestream, addressBuff, NUM_BYTES3) != NUM_BYTES3)		//write() returns the number of bytes actually written, if it doesn't match then an error occurred (e.g. no response from the device)
 	{
 		/* ERROR HANDLING: i2c transaction failed */
 		printf("Failed to write to the i2c bus.\n");
 	}
 	//Write the desired data to the memory location
-	if (write(filestream, buffer, NUM_BYTES2) != NUM_BYTES2)		//write() returns the number of bytes actually written, if it doesn't match then an error occurred (e.g. no response from the device)
-	{
+    //if (write(filestream, buffer, NUM_BYTES2) != NUM_BYTES2)		//write() returns the number of bytes actually written, if it doesn't match then an error occurred (e.g. no response from the device)
+    //{
 		/* ERROR HANDLING: i2c transaction failed */
-		printf("Failed to write to the i2c bus.\n");
-	}
+    //	printf("Failed to write to the i2c bus.\n");
+    //}
 }
 
 //Read an 8 bit value from the PSoC5 and return it after the appropriate request has been made.
